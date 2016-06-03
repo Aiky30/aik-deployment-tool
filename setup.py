@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name = 'aik_deployment_tool',
+    name = 'aik-deployment-tool',
     version = '0.1',
     packages = [''],
     url = '',
