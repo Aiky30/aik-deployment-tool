@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name = 'aik-deployment-tool',
-    version = '0.1',
+    version = '0.1.1',
     packages = [''],
     url = '',
     license = '',
