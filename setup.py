@@ -2,8 +2,8 @@ from distutils.core import setup
 
 setup(
     name = 'aik_deployment_tool',
-    version = '0.1.1',
-    packages = [],
+    version = '0.1.2',
+    packages = ['aik_deployment_tool'],
     url = '',
     license = '',
     author = 'aiky30',
