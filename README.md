@@ -4,8 +4,13 @@ Python deployment tool
 This file allows a development environment to be built
 Multiple production sites to be created, deployed and maintained
 
+Install within a project using PIP
+````
+    pip install -e git+https://github.com/Aiky30/aik_deployment_tool.git#egg=aik_deployment_tool
+````
 
-FIXME: The destroy method could potentially destroy all media files or any uploads, i would advise a move / copy with a date and then delete!!!
+FIXME:
+- The destroy method could potentially destroy all media files or any uploads, i would advise a move / copy with a date and then delete!!!
 ```
 Tasks:
     Build environment
