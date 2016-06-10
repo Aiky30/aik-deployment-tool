@@ -9,13 +9,8 @@ class Environment(object):
 
         self.environment = config['environment']
 
-        self.os = config['os']
-
-        #self.environment = self.set_enviroment()
-
         print("environment set: ", self.environment)
 
-    #   self.config = config  # Set the environment to work on
 
     def set_enviroment(self):
         # TODO: If remote select specific remote enviroment
@@ -25,6 +20,13 @@ class Environment(object):
         return self.environment;
 
     #def set_operating_system(self):
+
+
+class LocalEnvironment(Environment):
+
+    def __init__(self, config):
+
+        super(self.__class__, self).__init__(config)
 
 
 class RemoteEnvironment(Environment):

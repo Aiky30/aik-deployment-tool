@@ -2,16 +2,11 @@ from fabric.api import local, prompt, sudo
 
 from aik_deployment_tool.enviroment import Environment
 
-#TODO: Need a way to delete a file????
-
-class Directory(Environment):
+class Directory(object):
     # TODO: If the directory has permissions, register them etc so the config becomes native and an attribute of the class
 
     def __init__(self, Enviroment):
         print("Directory init", self, Enviroment)
-
-    def register_directory(self):
-        pass
 
     def destroy_directories(self, directory_dict):
         for label, directory in directory_dict.iteritems():
@@ -20,6 +15,8 @@ class Directory(Environment):
                 self.destroy_directory(directory)
 
     def build_directories(self, directory_dict):
+
+        print("\n## Folder structure\n")
 
         for label, directory in directory_dict.items():
 
@@ -42,8 +39,22 @@ class Directory(Environment):
         if 'owner' in directory['permissions'] and 'group' in directory['permissions']:
             self.set_directory_owner(directory)
 
+    """
+    def create_directory(self, directory):
+        pass
+
+    def destroy_directory(self, directory):
+        pass
+
+    def set_directory_owner(self, directory):
+        pass
+
+    def set_directory_privileges(self, directory):
+        pass
+    """
 
 class LocalDirectory(Directory):
+
     def create_directory(self, directory):
 
         if 'parents' in directory['creation'] and directory['creation']['parents']:
@@ -54,12 +65,23 @@ class LocalDirectory(Directory):
     # Delete any directories
     def destroy_directory(self, directory):
 
-        answer = prompt('Are you sure you want to delete: %s (y/n)' % directory['path'])
+        answered = False
 
-        print("You answered: %s" % answer)
+        while answered is False:
 
-        if answer == 'y':
-            local("sudo rm -R %s" % directory['path'])
+            directory_path = directory['path']
+            answer = prompt('Are you sure you want to delete: %s (y/n)' % directory_path)
+
+            if answer == 'y':
+                answered=True
+                local("sudo rm -R %s" % directory_path)
+
+            elif answer == 'n':
+                answered = True
+                print("you answered no")
+
+            else:
+                print("Wrong answer, please try again.")
 
     def set_directory_level(self, directory):
 
