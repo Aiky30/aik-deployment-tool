@@ -1,12 +1,12 @@
 from fabric.api import local, prompt, sudo
 
-from aik_deployment_tool.enviroment import Environment
 
 class Directory(object):
     # TODO: If the directory has permissions, register them etc so the config becomes native and an attribute of the class
 
-    def __init__(self, Enviroment):
-        print("Directory init", self, Enviroment)
+    def __init__(self, environment):
+
+        self.environment=environment
 
     def destroy_directories(self, directory_dict):
         for label, directory in directory_dict.iteritems():
@@ -31,13 +31,20 @@ class Directory(object):
 
     def set_directory_privileges(self, directory):
 
+        permissions = directory['permissions']
+
         # If a level is set
-        if 'level' in directory['permissions']:
+        if 'level' in permissions:
             self.set_directory_level(directory)
 
         # If an owner and group is set
-        if 'owner' in directory['permissions'] and 'group' in directory['permissions']:
+        if 'owner' in permissions and 'group' in permissions:
             self.set_directory_owner(directory)
+
+        # If the os is an RPM flavour and an selinux policy is set
+        if 'selinux' in permissions and self.environment.local_config['system']['os'] is 'fedora':
+            self.set_selinux_policy(directory)
+
 
     """
     def create_directory(self, directory):
@@ -52,6 +59,7 @@ class Directory(object):
     def set_directory_privileges(self, directory):
         pass
     """
+
 
 class LocalDirectory(Directory):
 
@@ -98,6 +106,16 @@ class LocalDirectory(Directory):
         else:
             local("sudo chown %s:%s %s" % (
                 directory['permissions']['owner'], directory['permissions']['group'], directory['path']))
+
+    def set_selinux_policy(self, directory):
+
+        print("SELINUX BRO\n\n\n\n\n")
+        print(directory)
+
+        if directory['permissions']['selinux'] is 'httpd_sys_rw_content_t':
+            local("sudo semanage fcontext -a -t httpd_sys_rw_content_t '%s'" % directory['path'])
+            local("sudo restorecon -v '%s'" % directory['path'])
+
 
 class RemoteDirectory(Directory):
 

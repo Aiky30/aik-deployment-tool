@@ -8,9 +8,16 @@ Install within a project using PIP
 ````
     pip install -e git+https://github.com/Aiky30/aik_deployment_tool.git#egg=aik_deployment_tool
 ````
-
+TODO:
+- Rollback:
+    - copy previous code
+    - copy previous virt env
+    - copy previous deployment script???
+    - DB
+    .....
 FIXME:
 - The destroy method could potentially destroy all media files or any uploads, i would advise a move / copy with a date and then delete!!!
+- The clean command should use the config files and code that first created all or else it won't clean properly, could create issues with bugfixes that arn't fixed. hmm, difficult
 ```
 Tasks:
     Build environment

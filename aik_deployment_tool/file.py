@@ -1,11 +1,10 @@
 from fabric.api import local, prompt
 
-from aik_deployment_tool.enviroment import Environment
+class File(object):
 
-class File(Environment):
+    def __init__(self, Environment):
 
-    def __init__(self, Enviroment):
-        print("Directory init", self, Enviroment)
+        self.Environment = Environment
 
     def destroy_files(self, files_dict):
         for label, file_dict in files_dict.iteritems():
@@ -36,14 +35,11 @@ class LocalFile(File):
             else:
                 print("Wrong answer, please try again.")
 
-
     def copy_file(self, from_location, to_location):
         local("cp %s %s" % (from_location, to_location))
 
-
     def link_file(self, from_location, to_location):
         local("sudo ln -s %s %s" % (from_location, to_location))
-
 
     def copy_all(self, from_location, to_location):
         local("cp -r %s. %s" % (from_location, to_location))

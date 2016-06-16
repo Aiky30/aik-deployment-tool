@@ -1,81 +1,123 @@
-from fabric.api import local, lcd, cd, run, sudo
 
-from directory import LocalDirectory
-from file import LocalFile
 
 class Plugin(object):
 
-    def __init__(self, Environment):
+    def __init__(self, environment, plugin_config):
 
-        self.environment = Environment
+        self.environment = environment
+        self.plugin_config = plugin_config
 
-        print("plugin init: ", self, Environment.environment)
+    def install(self):
 
-class LocalPlugin(Plugin):
+        if 'directories' in self.plugin_config:
+            directory_instance = self.environment.directory
+            directory_instance.build_directories(self.plugin_config['directories'])
 
-    def __init__(self, Environment):
-        super(self.__class__, self).__init__(Environment)
+    def remove(self):
 
-    def install(self, plugin):
+        if 'directories' in self.plugin_config:
+            directory_instance = self.environment.directory
+            directory_instance.destroy_directories(self.plugin_config['directories'])
 
-        directory_instance = LocalDirectory(self.environment)
-        directory_instance.build_directories(plugin['directories'])
+        if 'files' in self.plugin_config:
+            file_instance = self.environment.file
+            file_instance.destroy_files(self.plugin_config['files'])
 
-    def remove(self, plugin):
 
-        directory_instance = LocalDirectory(self.environment)
-        directory_instance.destroy_directories(plugin['directories'])
+class ApachePlugin(Plugin):
 
-        file_instance = LocalFile(self.environment)
-        file_instance.destroy_files(plugin['files'])
+    def configure(self):
 
-    def configure(self, plugin):
-
-        file_instance = LocalFile(self.environment)
+        file_instance = self.environment.file
+        config = self.plugin_config['config']
 
         file_instance.copy_file(
-            plugin['config']['copy_from'],
-            plugin['config']['copy_to'],
+            config['copy_from'],
+            config['copy_to'],
         )
 
         file_instance.link_file(
-            plugin['config']['copy_to'],
-            plugin['config']['symlink'],
+            config['copy_to'],
+            config['symlink'],
         )
-"""
-LOCAL_BACKEND_APPS['apache'] = {
-    'dependencies': [
-        'project',
-        'logs',
-        'config'
-    ],
-    'directories': {
-        'logs': {
-            'path': os.path.join(LOCAL_PROJECT['backend_root'], "logs/apache"),
-            'create': True,
-            'parents': True
-        },
-        'config': {
-            'path': os.path.join(LOCAL_PROJECT['backend_root'], "config/apache"),
-            'creation': {}
-        }
-    },
-    'files': {
-        'config': {
-            'path': os.path.join(LOCAL_SYSTEM['apache_config_root'], "gismoh-dev-backend.conf"),
-            'destroy': True
-        }
-    },
-    'services': {
-        'apache': {
-            'restart_cmd': "sudo service apache2 restart"
-        }
-    },
-    'config': {
-        'symlink': os.path.join(LOCAL_SYSTEM['apache_config_root'], "gismoh-dev-backend.conf"),
-        'copy_from': os.path.join(LOCAL_PROJECT['build_resources'], "backend/development.conf"),
-        'copy_to': os.path.join(LOCAL_PROJECT['backend_root'], 'logs/apache/dev-backend.conf')
-    }
-}
 
-"""
+
+class PythonPlugin(Plugin):
+
+    def install(self):
+
+        super(self.__class__, self).install()
+
+        # Configure virtual environment
+        self.configure_virtual_environment()
+
+        # Get the source from the repository
+        self.get_from_repository()
+
+        # Install libraries
+        self.install_libraries()
+
+    def configure_virtual_environment(self):
+
+        virtual_environment = self.plugin_config['virtual_environment']
+
+        self.environment.operation.run(
+            virtual_environment['create_cmd'] + " " + virtual_environment['library_container']
+        )
+
+    def install_libraries(self):
+
+        packages = self.plugin_config['pip_packages']
+
+        self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
+
+    def get_from_repository(self):
+
+        # If a source exists copy from that
+        if 'source' in self.plugin_config:
+
+            source = self.plugin_config['source']
+
+            file_instance = self.environment.file
+            file_instance.copy_all(source['location'], source['destination'])
+
+        # Otherwise use our cached version
+        else:
+
+            repository = self.plugin_config['repository']
+            branch = repository['branch']
+
+# FIXME:
+            self.environment.operation.run(
+                "git clone %s %s" % (repository['url'], repository['destination'])
+            )
+
+            if branch is not False:
+                self.environment.operation.run_from_directory(
+                    repository['destination'], "git checkout %s" % branch
+                )
+
+
+class DjangoPlugin(Plugin):
+
+    def collect_static_files(self):
+
+        self.environment.operation.run(self.plugin_config['utilities']['collect_static']['run_cmd'])
+
+    def run_migrations(self):
+
+        self.environment.operation.run(self.plugin_config['utilities']['migrate']['run_cmd'])
+
+    def run_development_server(self):
+
+        self.environment.operation.run(self.plugin_config['utilities']['django_server']['start_cmd'])
+
+
+class GismohPlugin(Plugin):
+
+    def copy_data(self):
+
+        gismoh_data = self.plugin_config['gismoh_data']
+        file_instance = self.environment.file
+
+        file_instance.copy_all(gismoh_data['copy_from'], gismoh_data['copy_to'])

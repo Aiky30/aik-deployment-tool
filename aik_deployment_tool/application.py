@@ -5,8 +5,7 @@ import warnings
 class Application(object):
 
     def __init__(self, Environment):
-
-        print("application init: ", self, Environment.environment)
+        self.environment = Environment
 
     def configure_virtual_environment(self, application):
         print("\n## Virtual environment setup\n")
@@ -28,6 +27,12 @@ class LocalApplication(Application):
     def install_application_from_repo(self, application, directories):
 
         super(self.__class__, self).install_application_from_repo(application, directories)
+
+
+        warnings.warn(
+            "Should be handled in project!!",
+            DeprecationWarning
+        )
 
         branch = application['repository']['branch']
 
