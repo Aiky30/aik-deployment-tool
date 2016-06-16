@@ -1,6 +1,16 @@
 # aik-deployment-tool
 Python deployment tool
 
+
+## Making changes
+
+1. Update the version in the setup.py file.
+2. Commit the changes that are part of the version
+3. Update any package dependencies in the requirements file
+4. Push to the relevant branch
+
+## Installation
+
 This file allows a development environment to be built
 Multiple production sites to be created, deployed and maintained
 
