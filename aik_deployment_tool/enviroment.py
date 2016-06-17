@@ -46,6 +46,9 @@ class LocalEnvironment(Environment):
         self.file = LocalFile(self)
         self.operation = LocalOperation(self)
 
+        # Register services
+        self.register_services()
+
     def register_services(self):
 
         # for each app

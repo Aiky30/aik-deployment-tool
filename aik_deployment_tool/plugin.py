@@ -87,7 +87,6 @@ class PythonPlugin(Plugin):
             repository = self.plugin_config['repository']
             branch = repository['branch']
 
-# FIXME:
             self.environment.operation.run(
                 "git clone %s %s" % (repository['url'], repository['destination'])
             )
@@ -112,8 +111,7 @@ class DjangoPlugin(Plugin):
 
         self.environment.operation.run(self.plugin_config['utilities']['django_server']['start_cmd'])
 
-
-class GismohPlugin(Plugin):
+class GismohBackEndPlugin(Plugin):
 
     def copy_data(self):
 
@@ -121,3 +119,82 @@ class GismohPlugin(Plugin):
         file_instance = self.environment.file
 
         file_instance.copy_all(gismoh_data['copy_from'], gismoh_data['copy_to'])
+
+    def import_data(self):
+
+        utilities = self.plugin_config['utilities']
+
+        # Clean any previous imported data
+        self.environment.operation.run(utilities['migrate-mrsa001_api-zero']['run_cmd'])
+
+        # re-apply any migrations
+        self.environment.operation.run(utilities['migrate-mrsa001_api']['run_cmd'])
+
+        # Import the data
+        self.environment.operation.run(utilities['data-import']['run_cmd'])
+
+
+# Front end specific
+
+class JavascriptPlugin(Plugin):
+
+    def install(self):
+
+        super(self.__class__, self).install()
+
+        # Get the source from the repository
+        self.get_from_repository()
+
+        # Install libraries
+        self.install_libraries()
+
+    def install_libraries(self):
+
+        packages = self.plugin_config['js_packages']
+
+        self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
+
+    def get_from_repository(self):
+
+        # If a source exists copy from that
+        if 'source' in self.plugin_config:
+
+            source = self.plugin_config['source']
+
+            file_instance = self.environment.file
+            file_instance.copy_all(source['location'], source['destination'])
+
+        # Otherwise use our cached version
+        else:
+
+            repository = self.plugin_config['repository']
+            branch = repository['branch']
+
+            self.environment.operation.run(
+                "git clone %s %s" % (repository['url'], repository['destination'])
+            )
+
+            if branch is not False:
+                self.environment.operation.run_from_directory(
+                    repository['destination'], "git checkout %s" % branch
+                )
+
+
+class NodePlugin(Plugin):
+
+    def run_development_server(self):
+
+        server = self.plugin_config['utilities']['node_development_server']
+
+        self.environment.operation.run_from_directory(
+            server['run_from'], server['run_cmd']
+        )
+
+class GismohFrontEndPlugin(Plugin):
+
+    def copy_config(self):
+
+        gismoh_config = self.plugin_config['gismoh_config']
+        file_instance = self.environment.file
+
+        file_instance.copy_file(gismoh_config['copy_from'], gismoh_config['copy_to'])
