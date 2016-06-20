@@ -13,6 +13,24 @@ class Plugin(object):
             directory_instance = self.environment.directory
             directory_instance.build_directories(self.plugin_config['directories'])
 
+    def process_actions(self):
+
+        operation_instance = self.environment.operation
+
+        actions = self.plugin_config['actions']
+
+        if 'copy_file' in actions:
+            for action in actions['copy_file']:
+                operation_instance.copy_file(action['source'], action['destination'])
+
+        if 'copy_all' in actions:
+            for action in actions['copy_all']:
+                operation_instance.copy_all(action['source'], action['destination'])
+
+        if 'sym_link' in actions:
+            for action in actions['sym_link']:
+                operation_instance.link_file(action['source'], action['destination'])
+
     def remove(self):
 
         if 'directories' in self.plugin_config:
@@ -26,21 +44,9 @@ class Plugin(object):
 
 class ApachePlugin(Plugin):
 
-    def configure(self):
+    def install(self):
 
-        file_instance = self.environment.file
-        config = self.plugin_config['config']
-
-        file_instance.copy_file(
-            config['copy_from'],
-            config['copy_to'],
-        )
-
-        file_instance.link_file(
-            config['copy_to'],
-            config['symlink'],
-        )
-
+        super(self.__class__, self).install()
 
 class PythonPlugin(Plugin):
 
@@ -113,16 +119,11 @@ class DjangoPlugin(Plugin):
 
 class GismohBackEndPlugin(Plugin):
 
-    def copy_data(self):
-
-        gismoh_data = self.plugin_config['gismoh_data']
-        file_instance = self.environment.file
-
-        file_instance.copy_all(gismoh_data['copy_from'], gismoh_data['copy_to'])
-
     def import_data(self):
 
         utilities = self.plugin_config['utilities']
+
+# FIXME: Too generic!!
 
         # Clean any previous imported data
         self.environment.operation.run(utilities['migrate-mrsa001_api-zero']['run_cmd'])
@@ -192,9 +193,12 @@ class NodePlugin(Plugin):
 
 class GismohFrontEndPlugin(Plugin):
 
-    def copy_config(self):
+    def install(self):
 
-        gismoh_config = self.plugin_config['gismoh_config']
-        file_instance = self.environment.file
+        super(self.__class__, self).install()
 
-        file_instance.copy_file(gismoh_config['copy_from'], gismoh_config['copy_to'])
+
+
+
+
+

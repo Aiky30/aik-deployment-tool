@@ -16,3 +16,12 @@ class LocalOperation(object):
         with lcd(directory):
 
             local(command)
+
+    def copy_file(self, from_location, to_location):
+        local("cp %s %s" % (from_location, to_location))
+
+    def link_file(self, from_location, to_location):
+        local("sudo ln -s %s %s" % (from_location, to_location))
+
+    def copy_all(self, from_location, to_location):
+        local("cp -r %s. %s" % (from_location, to_location))

@@ -1,6 +1,5 @@
 from fabric.api import local, prompt, sudo
 
-
 class Directory(object):
     # TODO: If the directory has permissions, register them etc so the config becomes native and an attribute of the class
 
@@ -108,9 +107,6 @@ class LocalDirectory(Directory):
                 directory['permissions']['owner'], directory['permissions']['group'], directory['path']))
 
     def set_selinux_policy(self, directory):
-
-        print("SELINUX BRO\n\n\n\n\n")
-        print(directory)
 
         if directory['permissions']['selinux'] is 'httpd_sys_rw_content_t':
             local("sudo semanage fcontext -a -t httpd_sys_rw_content_t '%s'" % directory['path'])
