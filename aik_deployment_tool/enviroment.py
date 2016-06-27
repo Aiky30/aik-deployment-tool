@@ -5,6 +5,11 @@ from aik_deployment_tool.file import LocalFile
 from aik_deployment_tool.service import LocalService
 from aik_deployment_tool.operation import LocalOperation
 
+from aik_deployment_tool.directory import RemoteDirectory
+from aik_deployment_tool.file import RemoteFile
+from aik_deployment_tool.service import RemoteService
+from aik_deployment_tool.operation import RemoteOperation
+
 class Environment(object):
 
     # FIXME: May be bad to set in init as it gets called on inheritance
@@ -18,17 +23,16 @@ class Environment(object):
 
         self.remote_environment = False
         self.local_environment = False
-
-
+"""
     def set_enviroment(self):
         # TODO: If remote select specific remote enviroment
         return prompt("Which environment do you want to use? options: local | remote")
 
-# FIXME: Wording of environment here is old, needs a new name as environment takes a new meaning
+        # FIXME: Wording of environment here is old, needs a new name as environment takes a new meaning
+
     def get_enviroment(self):
         return self.environment;
-
-    #def set_operating_system(self):
+"""
 
 
 class LocalEnvironment(Environment):
@@ -58,17 +62,29 @@ class LocalEnvironment(Environment):
             if 'services' in app:
                 self.service.register_service(app['services'])
 
+
 class RemoteEnvironment(Environment):
 
-    """
-        def __init__(self, config):
+    def __init__(self, config, app_config):
 
-        Environment.__init__(self, config)
-    """
+        super(self.__class__, self).__init__(config, app_config)
 
-    def __init__(self, config):
+        self.remote_environment = True
 
-        super(self.__class__, self).__init__(config)
+        self.service = RemoteService(self)
+        self.directory = RemoteDirectory(self)
+        self.file = RemoteFile(self)
+        self.operation = RemoteOperation(self)
+
+
+
+
+# TODO: Fidn app in config, error if doesn't exist!!!
+
+
+
+
+
 
     # Set the environment to work on
     def set_remote_environment(self, available_environments):
