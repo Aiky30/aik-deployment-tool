@@ -146,15 +146,6 @@ class JavascriptPlugin(Plugin):
         # Get the source from the repository
         self.get_from_repository()
 
-        # Install libraries
-        self.install_libraries()
-
-    def install_libraries(self):
-
-        packages = self.plugin_config['js_packages']
-
-        self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
-
     def get_from_repository(self):
 
         # If a source exists copy from that
@@ -183,6 +174,19 @@ class JavascriptPlugin(Plugin):
 
 class NodePlugin(Plugin):
 
+    def install(self):
+
+        super(self.__class__, self).install()
+
+        # Install libraries
+        self.install_libraries()
+
+    def install_libraries(self):
+
+        packages = self.plugin_config['utilities']['js_packages']
+
+        self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
+
     def run_development_server(self):
 
         server = self.plugin_config['utilities']['node_development_server']
@@ -198,6 +202,13 @@ class GismohFrontEndPlugin(Plugin):
         super(self.__class__, self).install()
 
 
+class GismohFrontEndDistributionPlugin(Plugin):
+
+    def prepare_distribution(self):
+
+        packages = self.plugin_config['utilities']['create_distribution']
+
+        self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
 
 
 

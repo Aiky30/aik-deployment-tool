@@ -77,14 +77,7 @@ class RemoteEnvironment(Environment):
         self.operation = RemoteOperation(self)
 
 
-
-
 # TODO: Fidn app in config, error if doesn't exist!!!
-
-
-
-
-
 
     # Set the environment to work on
     def set_remote_environment(self, available_environments):
