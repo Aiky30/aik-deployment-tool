@@ -9,13 +9,15 @@ class Operation(object):
 
 class LocalOperation(Operation):
 
+    def sudo_run(self, command):
+        local(command)
+
     def run(self, command):
         local(command)
 
     def run_from_directory(self, directory, command):
 
         with lcd(directory):
-
             local(command)
 
     def copy_file(self, from_location, to_location):
@@ -30,13 +32,21 @@ class LocalOperation(Operation):
 
 class RemoteOperation(Operation):
 
-    def run(self, command):
+    def sudo_run(self, command):
         sudo(command)
+
+    def sudo_run_from_directory(self, directory, command):
+
+        with cd(directory):
+            sudo(command)
+
+    def run(self, command):
+        run(command)
 
     def run_from_directory(self, directory, command):
 
         with cd(directory):
-            sudo(command)
+            run(command)
 
     def copy_file(self, from_location, to_location):
         run("cp %s %s" % (from_location, to_location))

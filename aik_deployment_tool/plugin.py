@@ -1,4 +1,5 @@
 
+#FIXME: Teh python and javascript sections contain project specific instructions, this is very bad
 
 class Plugin(object):
 
@@ -63,6 +64,14 @@ class PythonPlugin(Plugin):
         # Install libraries
         self.install_libraries()
 
+    def update(self):
+
+        # Get the updated source from the repository
+        self.update_from_repository()
+
+        # Install libraries
+        self.install_libraries()
+
     def configure_virtual_environment(self):
 
         virtual_environment = self.plugin_config['virtual_environment']
@@ -102,20 +111,28 @@ class PythonPlugin(Plugin):
                     repository['destination'], "git checkout %s" % branch
                 )
 
+    def update_from_repository(self):
+
+        repository = self.plugin_config['repository']
+
+        self.environment.operation.run_from_directory(
+            repository['destination'], "git pull"
+        )
+
 
 class DjangoPlugin(Plugin):
 
     def collect_static_files(self):
 
-        self.environment.operation.run(self.plugin_config['utilities']['collect_static']['run_cmd'])
+        self.environment.operation.sudo_run(self.plugin_config['utilities']['collect_static']['run_cmd'])
 
     def run_migrations(self):
 
-        self.environment.operation.run(self.plugin_config['utilities']['migrate']['run_cmd'])
+        self.environment.operation.sudo_run(self.plugin_config['utilities']['migrate']['run_cmd'])
 
     def run_development_server(self):
 
-        self.environment.operation.run(self.plugin_config['utilities']['django_server']['start_cmd'])
+        self.environment.operation.sudo_run(self.plugin_config['utilities']['django_server']['start_cmd'])
 
 class GismohBackEndPlugin(Plugin):
 
@@ -126,13 +143,13 @@ class GismohBackEndPlugin(Plugin):
 # FIXME: Too generic!!
 
         # Clean any previous imported data
-        self.environment.operation.run(utilities['migrate-mrsa001_api-zero']['run_cmd'])
+        self.environment.operation.sudo_run(utilities['migrate-mrsa001_api-zero']['run_cmd'])
 
         # re-apply any migrations
-        self.environment.operation.run(utilities['migrate-mrsa001_api']['run_cmd'])
+        self.environment.operation.sudo_run(utilities['migrate-mrsa001_api']['run_cmd'])
 
         # Import the data
-        self.environment.operation.run(utilities['data-import']['run_cmd'])
+        self.environment.operation.sudo_run(utilities['data-import']['run_cmd'])
 
 
 # Front end specific
@@ -145,6 +162,19 @@ class JavascriptPlugin(Plugin):
 
         # Get the source from the repository
         self.get_from_repository()
+
+    def update(self):
+
+        # Get the updated source from the repository
+        self.update_from_repository()
+
+    def update_from_repository(self):
+
+        repository = self.plugin_config['repository']
+
+        self.environment.operation.run_from_directory(
+            repository['destination'], "git pull"
+        )
 
     def get_from_repository(self):
 
@@ -170,7 +200,6 @@ class JavascriptPlugin(Plugin):
                 self.environment.operation.run_from_directory(
                     repository['destination'], "git checkout %s" % branch
                 )
-
 
 class NodePlugin(Plugin):
 
