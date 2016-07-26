@@ -9,8 +9,15 @@ class Operation(object):
 
 class LocalOperation(Operation):
 
+    #FIXME: The sudo here is pointless for local, bad design!!
     def sudo_run(self, command):
         local(command)
+
+    #FIXME: The sudo here is pointless for local, bad design!!
+    def sudo_run_from_directory(self, directory, command):
+
+        with lcd(directory):
+            local(command)
 
     def run(self, command):
         local(command)

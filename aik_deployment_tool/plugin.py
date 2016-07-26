@@ -123,16 +123,17 @@ class PythonPlugin(Plugin):
 class DjangoPlugin(Plugin):
 
     def collect_static_files(self):
-
         self.environment.operation.sudo_run(self.plugin_config['utilities']['collect_static']['run_cmd'])
 
     def run_migrations(self):
-
         self.environment.operation.sudo_run(self.plugin_config['utilities']['migrate']['run_cmd'])
 
     def run_development_server(self):
+        self.environment.operation.sudo_run(self.plugin_config['utilities']['django_server']['run_cmd'])
 
-        self.environment.operation.sudo_run(self.plugin_config['utilities']['django_server']['start_cmd'])
+    def test(self):
+        self.environment.operation.sudo_run_from_directory(self.plugin_config['utilities']['test']['run_from'], self.plugin_config['utilities']['test']['run_cmd'])
+
 
 class GismohBackEndPlugin(Plugin):
 
