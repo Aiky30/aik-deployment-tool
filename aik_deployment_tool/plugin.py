@@ -134,6 +134,9 @@ class DjangoPlugin(Plugin):
     def test(self):
         self.environment.operation.sudo_run_from_directory(self.plugin_config['utilities']['test']['run_from'], self.plugin_config['utilities']['test']['run_cmd'])
 
+    def generate_pip_package_list(self):
+        self.environment.operation.sudo_run_from_directory(self.plugin_config['utilities']['generate_pip_package_list']['run_from'],
+                                                           self.plugin_config['utilities']['generate_pip_package_list']['run_cmd'])
 
 class GismohBackEndPlugin(Plugin):
 
