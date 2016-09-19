@@ -125,6 +125,9 @@ class DjangoPlugin(Plugin):
     def collect_static_files(self):
         self.environment.operation.sudo_run(self.plugin_config['utilities']['collect_static']['run_cmd'])
 
+    def make_migrations(self):
+        self.environment.operation.sudo_run(self.plugin_config['utilities']['makemigrations']['run_cmd'])
+
     def run_migrations(self):
         self.environment.operation.sudo_run(self.plugin_config['utilities']['migrate']['run_cmd'])
 
