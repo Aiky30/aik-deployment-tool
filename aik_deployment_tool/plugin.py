@@ -135,11 +135,14 @@ class DjangoPlugin(Plugin):
     def run_development_server(self):
         self.environment.operation.sudo_run(self.plugin_config['utilities']['django_server']['run_cmd'])
 
-    def run_management_command(self):
+    def run_management_command(self, arg):
 
         command = self.plugin_config['utilities']['run_management_command']['run_cmd']
 
-        answer = prompt('Enter a management command to execute')
+        if arg is None:
+            answer = prompt('Enter a management command to execute')
+        else:
+            answer = arg
 
         command = command.replace('PLACEHOLDER', answer)
 
