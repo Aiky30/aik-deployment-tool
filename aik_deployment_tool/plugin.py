@@ -1,3 +1,4 @@
+from fabric.api import prompt
 
 #FIXME: Teh python and javascript sections contain project specific instructions, this is very bad
 
@@ -133,6 +134,16 @@ class DjangoPlugin(Plugin):
 
     def run_development_server(self):
         self.environment.operation.sudo_run(self.plugin_config['utilities']['django_server']['run_cmd'])
+
+    def run_management_command(self):
+
+        command = self.plugin_config['utilities']['run_management_command']['run_cmd']
+
+        answer = prompt('Enter a management command to execute')
+
+        command = command.replace('PLACEHOLDER', answer)
+
+        self.environment.operation.sudo_run(command)
 
     def test(self):
         self.environment.operation.sudo_run_from_directory(self.plugin_config['utilities']['test']['run_from'], self.plugin_config['utilities']['test']['run_cmd'])
