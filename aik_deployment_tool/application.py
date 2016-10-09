@@ -28,7 +28,6 @@ class LocalApplication(Application):
 
         super(self.__class__, self).install_application_from_repo(application, directories)
 
-
         warnings.warn(
             "Should be handled in project!!",
             DeprecationWarning

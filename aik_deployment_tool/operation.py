@@ -36,6 +36,8 @@ class LocalOperation(Operation):
     def copy_all(self, from_location, to_location):
         local("cp -r %s. %s" % (from_location, to_location))
 
+    def copy_directory_contents(self, from_location, to_location):
+        local("cp -r %s %s" % (from_location, to_location))
 
 class RemoteOperation(Operation):
 
@@ -63,3 +65,6 @@ class RemoteOperation(Operation):
 
     def copy_all(self, from_location, to_location):
         run("cp -r %s. %s" % (from_location, to_location))
+
+    def copy_directory_contents(self, from_location, to_location):
+        run("cp -r %s %s" % (from_location, to_location))

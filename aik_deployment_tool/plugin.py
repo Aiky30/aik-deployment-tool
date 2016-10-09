@@ -1,6 +1,11 @@
+import os
 from fabric.api import prompt
+from datetime import datetime
 
-#FIXME: Teh python and javascript sections contain project specific instructions, this is very bad
+FILE_DATE_FORMAT = "_%Y_%m_%d_%H_%M"
+
+# FIXME: The python and javascript sections contain project specific instructions, this is very bad
+
 
 class Plugin(object):
 
@@ -155,6 +160,12 @@ class DjangoPlugin(Plugin):
         self.environment.operation.sudo_run_from_directory(self.plugin_config['utilities']['generate_pip_package_list']['run_from'],
                                                            self.plugin_config['utilities']['generate_pip_package_list']['run_cmd'])
 
+    def backup_media_files(self):
+
+        action = self.plugin_config['backup_media']
+
+        self.environment.operation.copy_directory_contents(action['source'], action['destination'])
+
 class GismohBackEndPlugin(Plugin):
 
     def import_data(self):
@@ -245,6 +256,7 @@ class NodePlugin(Plugin):
             server['run_from'], server['run_cmd']
         )
 
+
 class GismohFrontEndPlugin(Plugin):
 
     def install(self):
@@ -261,5 +273,34 @@ class GismohFrontEndDistributionPlugin(Plugin):
         self.environment.operation.run_from_directory(packages['run_from'], packages['run_cmd'])
 
 
+class MySQLDatabasePlugin(Plugin):
 
+    def create_backup(self):
+
+        # Generate the current date and time
+        current_timestamp = datetime.today()
+        formatted_timestamp = current_timestamp.strftime(FILE_DATE_FORMAT)
+
+        backup_path = self.plugin_config['directories']['backup_path']['path']
+        backup_filename = self.plugin_config['utilities']['backup']['database_name'] + formatted_timestamp + '.sql'
+
+        _db_dump_output_path = os.path.join(backup_path, backup_filename)
+
+        self.environment.operation.sudo_run("mysqldump -u %s -p%s %s > %s" % (
+            self.plugin_config['utilities']['backup']['database_user'],
+            self.plugin_config['utilities']['backup']['database_password'],
+            self.plugin_config['utilities']['backup']['database_name'],
+            _db_dump_output_path)
+        )
+
+    def import_from_backup(self):
+
+        _import_path = self.plugin_config['utilities']['import']['file']
+
+        self.environment.operation.sudo_run("mysql -u %s -p%s %s < %s" % (
+            self.plugin_config['utilities']['import']['database_user'],
+            self.plugin_config['utilities']['import']['database_password'],
+            self.plugin_config['utilities']['import']['database_name'],
+            _import_path)
+        )
 
