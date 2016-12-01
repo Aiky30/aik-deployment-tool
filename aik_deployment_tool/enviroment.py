@@ -1,6 +1,6 @@
 import warnings
 
-from fabric.api import prompt
+from fabric.api import prompt, env
 
 from aik_deployment_tool.directory import LocalDirectory
 from aik_deployment_tool.file import LocalFile
@@ -15,13 +15,10 @@ from aik_deployment_tool.operation import RemoteOperation
 class Environment(object):
 
     # FIXME: May be bad to set in init as it gets called on inheritance
-    def __init__(self, config, app_config):
+    def __init__(self, app_config):
 
-        print("Environment init", config)
+        self.system = env.system_config
 
-        self.environment = config['environment']
-
-        self.config = config
         self.app_config = app_config
 
         self.remote_environment = False
@@ -47,9 +44,9 @@ class Environment(object):
 
 class LocalEnvironment(Environment):
 
-    def __init__(self, config, app_config):
+    def __init__(self, app_config):
 
-        super(self.__class__, self).__init__(config, app_config)
+        super(self.__class__, self).__init__(app_config)
 
         self.local_environment = True
 
@@ -64,9 +61,9 @@ class LocalEnvironment(Environment):
 
 class RemoteEnvironment(Environment):
 #TODO: Prompt the user what directory they are working with before starting any commands when working with the server
-    def __init__(self, config, app_config):
+    def __init__(self, app_config):
 
-        super(self.__class__, self).__init__(config, app_config)
+        super(self.__class__, self).__init__(app_config)
 
         self.remote_environment = True
 

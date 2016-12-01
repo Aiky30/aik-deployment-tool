@@ -41,7 +41,7 @@ class Directory(object):
             self.set_directory_owner(directory)
 
         # If the os is an RPM flavour and an selinux policy is set
-        if 'selinux' in permissions and self.environment.config['system']['os'] is 'fedora':
+        if 'selinux' in permissions and self.environment.system['os'] is 'fedora':
             self.set_selinux_policy(directory)
 
 
